@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import News from "./News";
+import FinancialMetricsPanel, { getRedFlags } from "../components/StockDetails/FinancialMetricsPanel";
 
 const mockStocks = [
-  { id: "RELIANCE", name: "Reliance Industries Ltd.", price: 2875.2, change: 1.2, marketCap: 1930000, pe: 22.5 },
-  { id: "TCS", name: "Tata Consultancy Services", price: 3850.5, change: -0.8, marketCap: 1400000, pe: 29.1 },
-  { id: "HDFCBANK", name: "HDFC Bank Ltd.", price: 1550.0, change: 0.4, marketCap: 900000, pe: 18.7 },
-  { id: "INFY", name: "Infosys Ltd.", price: 1450.3, change: 0.6, marketCap: 600000, pe: 25.2 },
-  { id: "ITC", name: "ITC Ltd.", price: 450.8, change: -0.3, marketCap: 560000, pe: 20.4 },
+  { id: "RELIANCE", name: "Reliance Industries Ltd.", price: 2875.2, change: 1.2, marketCap: 1930000, pe: 22.5, metrics: { debtEquity: 0.6, pledge: 0, roe: 14, promoter: 49, profitGrowth: 10, opm: 18 } },
+  { id: "TCS", name: "Tata Consultancy Services", price: 3842.5, change: -0.5, marketCap: 1400000, pe: 28.1, metrics: { debtEquity: 0.1, pledge: 0, roe: 25, promoter: 72, profitGrowth: 8, opm: 27 } },
+  { id: "HDFCBANK", name: "HDFC Bank Ltd.", price: 1502.9, change: 0.7, marketCap: 1150000, pe: 18.9, metrics: { debtEquity: 1.1, pledge: 0, roe: 16, promoter: 25, profitGrowth: 7, opm: 22 } },
+  { id: "INFY", name: "Infosys Ltd.", price: 1410.6, change: 0.3, marketCap: 590000, pe: 24.7, metrics: { debtEquity: 0.2, pledge: 0, roe: 20, promoter: 13, profitGrowth: 5, opm: 21 } },
+  { id: "ITC", name: "ITC Ltd.", price: 450.8, change: -0.3, marketCap: 560000, pe: 20.4, metrics: { debtEquity: 0.1, pledge: 0, roe: 28, promoter: 0, profitGrowth: 12, opm: 33 } },
 ];
 
 const adminNews = [
@@ -142,9 +143,11 @@ const Dashboard = () => {
             <div className="flex flex-wrap gap-3">
               {watchlist.map(symbol => {
                 const stock = mockStocks.find(s => s.id === symbol);
+                const redFlags = stock ? getRedFlags(stock.metrics) : [];
                 return stock ? (
                   <div key={symbol} className="flex items-center gap-2 bg-white border border-yellow-200 px-3 py-1 rounded shadow-sm">
                     <span className="font-semibold text-yellow-800">{stock.name} <span className="text-xs text-gray-400">({symbol})</span></span>
+                    {redFlags.length > 0 && <span className="ml-1 text-red-600" title="Red Flags Detected">⚠️</span>}
                     <button onClick={() => removeFromWatchlist(symbol)} className="text-xs px-2 py-0.5 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-900 font-bold">✕</button>
                   </div>
                 ) : null;
@@ -209,32 +212,36 @@ const Dashboard = () => {
                 <td colSpan={6} className="text-center text-gray-400 py-8 text-lg">No stocks found.</td>
               </tr>
             ) : (
-              filteredStocks.map(stock => (
-                <tr key={stock.id} className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition cursor-pointer group" onClick={() => navigate(`/stock/${stock.id}`)}>
-                  <td className="px-4 py-3 font-semibold text-blue-700 group-hover:underline flex items-center gap-2">
-                    {stock.name}
-                    <button
-                      className={`text-lg ${isInWatchlist(stock.id) ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-500 focus:outline-none`}
-                      title={isInWatchlist(stock.id) ? 'Remove from Watchlist' : 'Add to Watchlist'}
-                      onClick={e => { e.stopPropagation(); isInWatchlist(stock.id) ? removeFromWatchlist(stock.id) : addToWatchlist(stock.id); }}
-                    >
-                      ★
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">{stock.price.toLocaleString()}</td>
-                  <td className={`px-4 py-3 ${stock.change > 0 ? 'text-green-600' : stock.change < 0 ? 'text-red-600' : 'text-gray-700'} font-bold`}>{stock.change > 0 ? '+' : ''}{stock.change}%</td>
-                  <td className="px-4 py-3">{stock.marketCap.toLocaleString()}</td>
-                  <td className="px-4 py-3">{stock.pe}</td>
-                  <td className="px-4 py-3">
-                    <button
-                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-4 py-1.5 rounded-lg shadow-sm transition font-semibold text-xs"
-                      onClick={e => { e.stopPropagation(); navigate(`/stock/${stock.id}`); }}
-                    >
-                      View Details
-                    </button>
-                  </td>
-                </tr>
-              ))
+              filteredStocks.map(stock => {
+                const redFlags = getRedFlags(stock.metrics);
+                return (
+                  <tr key={stock.id} className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition cursor-pointer group" onClick={() => navigate(`/stock/${stock.id}`)}>
+                    <td className="px-4 py-3 font-semibold text-blue-700 group-hover:underline flex items-center gap-2">
+                      {stock.name}
+                      <button
+                        className={`text-lg ${isInWatchlist(stock.id) ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-500 focus:outline-none`}
+                        title={isInWatchlist(stock.id) ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                        onClick={e => { e.stopPropagation(); isInWatchlist(stock.id) ? removeFromWatchlist(stock.id) : addToWatchlist(stock.id); }}
+                      >
+                        ★
+                      </button>
+                      {redFlags.length > 0 && <span className="ml-1 text-red-600" title="Red Flags Detected">⚠️</span>}
+                    </td>
+                    <td className="px-4 py-3">{stock.price.toLocaleString()}</td>
+                    <td className={`px-4 py-3 ${stock.change > 0 ? 'text-green-600' : stock.change < 0 ? 'text-red-600' : 'text-gray-700'} font-bold`}>{stock.change > 0 ? '+' : ''}{stock.change}%</td>
+                    <td className="px-4 py-3">{stock.marketCap.toLocaleString()}</td>
+                    <td className="px-4 py-3">{stock.pe}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-4 py-1.5 rounded-lg shadow-sm transition font-semibold text-xs"
+                        onClick={e => { e.stopPropagation(); navigate(`/stock/${stock.id}`); }}
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

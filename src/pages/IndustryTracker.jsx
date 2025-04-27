@@ -68,6 +68,69 @@ const industries = [
       { name: "Energy", value: 15 }
     ],
     geoImpact: "Dependent on monsoon and agri commodity prices. Exposed to global palm oil and packaging costs. Regulatory changes in food safety and labeling affect outlook."
+  },
+  {
+    key: "pharma",
+    name: "Pharmaceuticals",
+    seasonality: [
+      { quarter: "Q1", sales: 60 }, { quarter: "Q2", sales: 65 }, { quarter: "Q3", sales: 80 }, { quarter: "Q4", sales: 90 }
+    ],
+    marketLeaders: [
+      { name: "Sun Pharma", value: 28 },
+      { name: "Dr Reddy's", value: 18 },
+      { name: "Cipla", value: 16 },
+      { name: "Lupin", value: 12 },
+      { name: "Others", value: 26 }
+    ],
+    rawMaterials: [
+      { name: "APIs", value: 60 },
+      { name: "Packaging", value: 20 },
+      { name: "Chemicals", value: 15 },
+      { name: "Energy", value: 5 }
+    ],
+    geoImpact: "Export-driven, exposed to USFDA regulations and patent cliffs. Dependent on China for APIs. Sensitive to global health events and government pricing controls."
+  },
+  {
+    key: "energy",
+    name: "Energy & Power",
+    seasonality: [
+      { quarter: "Q1", gen: 90 }, { quarter: "Q2", gen: 110 }, { quarter: "Q3", gen: 120 }, { quarter: "Q4", gen: 100 }
+    ],
+    marketLeaders: [
+      { name: "NTPC", value: 30 },
+      { name: "Adani Power", value: 22 },
+      { name: "Tata Power", value: 18 },
+      { name: "Power Grid", value: 15 },
+      { name: "Others", value: 15 }
+    ],
+    rawMaterials: [
+      { name: "Coal", value: 60 },
+      { name: "Gas", value: 20 },
+      { name: "Renewables", value: 15 },
+      { name: "Others", value: 5 }
+    ],
+    geoImpact: "Highly regulated sector. Impacted by global coal/gas prices, government tariffs, and renewable policy changes. Geopolitical tensions affect fuel imports."
+  },
+  {
+    key: "cement",
+    name: "Cement",
+    seasonality: [
+      { quarter: "Q1", sales: 50 }, { quarter: "Q2", sales: 70 }, { quarter: "Q3", sales: 90 }, { quarter: "Q4", sales: 80 }
+    ],
+    marketLeaders: [
+      { name: "UltraTech", value: 38 },
+      { name: "Shree Cement", value: 18 },
+      { name: "Ambuja", value: 16 },
+      { name: "ACC", value: 12 },
+      { name: "Others", value: 16 }
+    ],
+    rawMaterials: [
+      { name: "Limestone", value: 45 },
+      { name: "Coal", value: 30 },
+      { name: "Gypsum", value: 15 },
+      { name: "Others", value: 10 }
+    ],
+    geoImpact: "Dependent on infrastructure demand and monsoon. Sensitive to coal and petcoke prices. Regulatory changes in mining and environmental norms impact costs."
   }
 ];
 
@@ -79,7 +142,7 @@ const IndustryTracker = () => {
   const industry = industries.find(i => i.key === selected);
 
   return (
-    <main className="max-w-5xl mx-auto py-10 px-2 md:px-0">
+    <main className="w-full py-8 px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-blue-900">Industry Tracker</h1>
         <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
@@ -95,21 +158,21 @@ const IndustryTracker = () => {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
         {/* Seasonality */}
-        <div className="bg-white rounded-xl shadow border p-4">
+        <div className="bg-white rounded-xl shadow border p-4 flex flex-col">
           <h2 className="text-lg font-bold mb-2 text-blue-800">Seasonality</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={industry.seasonality}>
-              <XAxis dataKey={industry.key === "auto" ? "month" : "quarter"} />
+              <XAxis dataKey={industry.key === "auto" ? "month" : industry.key === "energy" ? "quarter" : "quarter"} />
               <YAxis />
               <Tooltip />
-              <Bar dataKey={industry.key === "auto" ? "sales" : "revenue"} fill="#0088FE" />
+              <Bar dataKey={industry.key === "auto" ? "sales" : industry.key === "energy" ? "gen" : "sales"} fill="#0088FE" />
             </BarChart>
           </ResponsiveContainer>
         </div>
         {/* Market Leader */}
-        <div className="bg-white rounded-xl shadow border p-4">
+        <div className="bg-white rounded-xl shadow border p-4 flex flex-col">
           <h2 className="text-lg font-bold mb-2 text-blue-800">Market Leaders</h2>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
@@ -124,7 +187,7 @@ const IndustryTracker = () => {
           </ResponsiveContainer>
         </div>
         {/* Raw Material Dependence */}
-        <div className="bg-white rounded-xl shadow border p-4">
+        <div className="bg-white rounded-xl shadow border p-4 flex flex-col">
           <h2 className="text-lg font-bold mb-2 text-blue-800">Raw Material Dependence</h2>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
