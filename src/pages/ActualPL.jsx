@@ -17,6 +17,13 @@ const defaultTxn = {
   quantity: "",
   price: "",
   date: "",
+  brokerage: "",
+  gst: "",
+  stampDuty: "",
+  sebiFee: "",
+  stt: "",
+  otherCharges: "",
+  returnPct: "",
   fees: "",
   notes: ""
 };
@@ -71,6 +78,7 @@ const ActualPL = () => {
   const [txns, setTxns] = useState([]);
   const [form, setForm] = useState(defaultTxn);
   const [editingIdx, setEditingIdx] = useState(null);
+  const [expandedIdx, setExpandedIdx] = useState(null);
   const navigate = useNavigate();
 
   // Load from localStorage
@@ -151,33 +159,54 @@ const ActualPL = () => {
     <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-extrabold text-blue-900 mb-8">Actual Portfolio P&amp;L</h1>
       <section className="bg-white rounded-xl shadow border p-6 mb-10 overflow-x-auto">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Holdings</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">All Transactions</h2>
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-gray-50">
-              <th className="px-4 py-2 text-left font-medium text-gray-700">Stock</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Symbol</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Action</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700">Qty</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700">Buy Price</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700">Current Price</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700">P&amp;L</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Price</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Date</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Net P&amp;L</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Return %</th>
+              <th className="px-4 py-2"></th>
             </tr>
           </thead>
           <tbody>
             {txns.length === 0 ? (
-              <tr><td colSpan={6} className="text-center text-gray-400 py-8 text-lg">No holdings yet.</td></tr>
-            ) : txns.map((txn, i) => (
-              <tr key={i} className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition">
-                <td className="px-4 py-3 font-semibold text-blue-700">{txn.symbol}</td>
-                <td className="px-4 py-3">{txn.quantity}</td>
-                <td className="px-4 py-3">{txn.price}</td>
-                <td className="px-4 py-3">{getCurrentPrice(txn.symbol)}</td>
-                <td className={"px-4 py-3 font-bold " + (parseFloat(txn.price) < getCurrentPrice(txn.symbol) ? "text-green-600" : parseFloat(txn.price) > getCurrentPrice(txn.symbol) ? "text-red-600" : "text-gray-700")}>{parseFloat(txn.price) - getCurrentPrice(txn.symbol)}</td>
-                <td className="px-4 py-3">
-                  <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold mr-1">Edit</button>
-                  <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
-                </td>
-              </tr>
+              <tr><td colSpan={8} className="text-center text-gray-400 py-8 text-lg">No transactions yet.</td></tr>
+            ) : txns.map((txn, idx) => (
+              <React.Fragment key={idx}>
+                <tr className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
+                  onClick={() => setExpandedIdx(expandedIdx === idx ? null : idx)}>
+                  <td className="px-4 py-3 font-semibold text-blue-700">{txn.symbol}</td>
+                  <td className="px-4 py-3">{txn.action}</td>
+                  <td className="px-4 py-3">{txn.quantity}</td>
+                  <td className="px-4 py-3">{txn.price}</td>
+                  <td className="px-4 py-3">{txn.date}</td>
+                  <td className="px-4 py-3 font-bold">{txn.netPL || "-"}</td>
+                  <td className={"px-4 py-3 font-bold " + (txn.returnPct < 0 ? "text-red-600" : "text-green-600")}>{txn.returnPct || "-"}</td>
+                  <td className="px-4 py-3 text-center">
+                    <button className="text-xs text-blue-600 underline">{expandedIdx === idx ? "Hide" : "Show"} Details</button>
+                  </td>
+                </tr>
+                {expandedIdx === idx && (
+                  <tr className="bg-blue-50">
+                    <td colSpan={8} className="p-0">
+                      <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div><span className="font-semibold">Brokerage:</span> {txn.brokerage}</div>
+                        <div><span className="font-semibold">GST:</span> {txn.gst}</div>
+                        <div><span className="font-semibold">Stamp Duty:</span> {txn.stampDuty}</div>
+                        <div><span className="font-semibold">SEBI Fee:</span> {txn.sebiFee}</div>
+                        <div><span className="font-semibold">STT:</span> {txn.stt}</div>
+                        <div><span className="font-semibold">Other Charges:</span> {txn.otherCharges}</div>
+                        <div><span className="font-semibold">Notes:</span> {txn.notes}</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
@@ -209,8 +238,32 @@ const ActualPL = () => {
             <input name="date" type="date" value={form.date} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-32" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Brokerage/Fees</label>
-            <input name="fees" type="number" value={form.fees} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" placeholder="0" />
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Brokerage</label>
+            <input name="brokerage" type="number" value={form.brokerage} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">GST</label>
+            <input name="gst" type="number" value={form.gst} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Stamp Duty</label>
+            <input name="stampDuty" type="number" value={form.stampDuty} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">SEBI Fee</label>
+            <input name="sebiFee" type="number" value={form.sebiFee} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">STT</label>
+            <input name="stt" type="number" value={form.stt} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Other Charges</label>
+            <input name="otherCharges" type="number" value={form.otherCharges} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Return %</label>
+            <input name="returnPct" type="number" value={form.returnPct} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">Notes</label>
