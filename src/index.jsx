@@ -16,14 +16,13 @@ function AppShell({ children }) {
       <header className="w-full bg-white shadow sticky top-0 z-30">
         <nav className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-xl font-extrabold text-blue-700 tracking-tight">VidzAI</span>
-            <span className="text-xs text-gray-400 font-semibold ml-2">Personal Stock Suite</span>
+            <span className="text-xl font-extrabold text-blue-700 tracking-tight">Fintellect</span>
+            <span className="text-xs text-gray-400 font-semibold ml-2">Smart Indian Stock Suite</span>
           </div>
           <div className="flex gap-4">
-            <a href="/" className="hover:text-blue-700 font-semibold text-gray-700 transition">Dashboard</a>
+            <a href="/virtual-pl" className="hover:text-blue-700 font-semibold text-gray-700 transition">Virtual P&L</a>
+            <a href="/actual-pl" className="hover:text-blue-700 font-semibold text-gray-700 transition">Actual P&L</a>
             <a href="/industry-tracker" className="hover:text-blue-700 font-semibold text-gray-700 transition">Industry Tracker</a>
-            <a href="/virtual-pl" className="hover:text-blue-700 font-semibold text-gray-700 transition">Virtual P&amp;L</a>
-            <a href="/actual-pl" className="hover:text-blue-700 font-semibold text-gray-700 transition">Actual P&amp;L</a>
             <a href="/leads" className="hover:text-blue-700 font-semibold text-gray-700 transition">Leads</a>
             <a href="/news" className="hover:text-blue-700 font-semibold text-gray-700 transition">News</a>
           </div>
@@ -32,7 +31,7 @@ function AppShell({ children }) {
       <main className="flex-1 w-full">
         {children}
       </main>
-      <footer className="w-full bg-white border-t mt-10 py-4 text-center text-xs text-gray-500">&copy; {new Date().getFullYear()} VidzAI. All rights reserved.</footer>
+      <footer className="w-full bg-white border-t mt-10 py-4 text-center text-xs text-gray-500">&copy; {new Date().getFullYear()} Fintellect. All rights reserved.</footer>
     </div>
   );
 }

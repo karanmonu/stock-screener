@@ -12,10 +12,10 @@ const mockStocks = [
 ];
 
 const adminNews = [
-  { id: 1, title: "News Headline 1", impactQtr: "Q1", date: "2023-02-20" },
-  { id: 2, title: "News Headline 2", impactQtr: "Q2", date: "2023-03-15" },
-  { id: 3, title: "News Headline 3", impactQtr: "Q3", date: "2023-04-10" },
-  { id: 4, title: "News Headline 4", impactQtr: "Q4", date: "2023-05-05" },
+  { id: 1, title: "News Headline 1", impactQtr: "Q1", date: "2023-02-20", summary: "This is a summary of the news article." },
+  { id: 2, title: "News Headline 2", impactQtr: "Q2", date: "2023-03-15", summary: "This is another summary of the news article." },
+  { id: 3, title: "News Headline 3", impactQtr: "Q3", date: "2023-04-10", summary: "This is a summary of the news article." },
+  { id: 4, title: "News Headline 4", impactQtr: "Q4", date: "2023-05-05", summary: "This is another summary of the news article." },
 ];
 
 function getMinMax(arr, key) {
@@ -203,7 +203,7 @@ const Dashboard = () => {
           {adminNews.slice(0, 6).map((news, idx) => (
             <div key={news.id} className="bg-white rounded-xl shadow border p-4 flex flex-col gap-2">
               <div className="text-blue-800 font-bold text-base mb-1">{news.title}</div>
-              <div className="text-sm text-gray-700 flex-1">{news.content.length > 100 ? news.content.slice(0, 100) + '…' : news.content}</div>
+              <div className="text-sm text-gray-700 flex-1">{news.summary ? (news.summary.length > 100 ? news.summary.slice(0, 100) + '…' : news.summary) : ''}</div>
               <div className="text-xs text-gray-400 mt-2">{news.date}</div>
             </div>
           ))}

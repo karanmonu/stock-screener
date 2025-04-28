@@ -158,11 +158,11 @@ const IndustryTracker = () => {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-14 2xl:gap-16">
         {/* Seasonality */}
-        <div className="bg-white rounded-xl shadow border p-4 flex flex-col">
-          <h2 className="text-lg font-bold mb-2 text-blue-800">Seasonality</h2>
-          <ResponsiveContainer width="100%" height={220}>
+        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+          <h2 className="text-lg font-bold mb-4 text-blue-800">Seasonality</h2>
+          <ResponsiveContainer width="100%" height={320}>
             <BarChart data={industry.seasonality}>
               <XAxis dataKey={industry.key === "auto" ? "month" : industry.key === "energy" ? "quarter" : "quarter"} />
               <YAxis />
@@ -172,11 +172,11 @@ const IndustryTracker = () => {
           </ResponsiveContainer>
         </div>
         {/* Market Leader */}
-        <div className="bg-white rounded-xl shadow border p-4 flex flex-col">
-          <h2 className="text-lg font-bold mb-2 text-blue-800">Market Leaders</h2>
-          <ResponsiveContainer width="100%" height={220}>
+        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+          <h2 className="text-lg font-bold mb-4 text-blue-800">Market Leaders</h2>
+          <ResponsiveContainer width="100%" height={320}>
             <PieChart>
-              <Pie data={industry.marketLeaders} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+              <Pie data={industry.marketLeaders} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
                 {industry.marketLeaders.map((entry, idx) => (
                   <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
                 ))}
@@ -187,11 +187,11 @@ const IndustryTracker = () => {
           </ResponsiveContainer>
         </div>
         {/* Raw Material Dependence */}
-        <div className="bg-white rounded-xl shadow border p-4 flex flex-col">
-          <h2 className="text-lg font-bold mb-2 text-blue-800">Raw Material Dependence</h2>
-          <ResponsiveContainer width="100%" height={220}>
+        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+          <h2 className="text-lg font-bold mb-4 text-blue-800">Raw Material Dependence</h2>
+          <ResponsiveContainer width="100%" height={320}>
             <PieChart>
-              <Pie data={industry.rawMaterials} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+              <Pie data={industry.rawMaterials} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
                 {industry.rawMaterials.map((entry, idx) => (
                   <Cell key={`cell-raw-${idx}`} fill={COLORS[idx % COLORS.length]} />
                 ))}
@@ -202,10 +202,10 @@ const IndustryTracker = () => {
           </ResponsiveContainer>
         </div>
         {/* Geo Political Impact */}
-        <div className="bg-white rounded-xl shadow border p-4 flex flex-col">
-          <h2 className="text-lg font-bold mb-2 text-blue-800">Geo-Political Impact</h2>
+        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+          <h2 className="text-lg font-bold mb-4 text-blue-800">Geo-Political Impact</h2>
           <div className="flex-1 flex items-center justify-center">
-            <span className="text-base text-gray-700">{industry.geoImpact}</span>
+            <span className="text-base text-gray-700 text-center">{industry.geoImpact}</span>
           </div>
         </div>
       </div>
