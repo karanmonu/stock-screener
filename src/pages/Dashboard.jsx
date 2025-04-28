@@ -173,6 +173,7 @@ const Dashboard = () => {
             <button onClick={() => navigate('/actual-pl')} className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold transition shadow">Actual P&amp;L</button>
             <button onClick={() => navigate('/leads')} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow">Leads Tracker</button>
             <button onClick={() => navigate('/industry-tracker')} className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition shadow">Industry Tracker</button>
+            <button onClick={() => navigate('/star-investors')} className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-sm font-semibold transition shadow">Star Investors</button>
           </div>
         </div>
         {/* Watchlist Section */}

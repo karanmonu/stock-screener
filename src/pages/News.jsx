@@ -31,6 +31,31 @@ export const adminNews = [
 
 const USER_NEWS_KEY = "stock_screener_user_news";
 
+// --- Global error boundary for News page ---
+function ErrorBoundary({ children }) {
+  const [error, setError] = React.useState(null);
+  if (error) {
+    return (
+      <div className="bg-red-100 border-l-4 border-red-600 text-red-800 p-4 my-6 rounded">
+        <div className="font-bold mb-2">Something went wrong in News:</div>
+        <div className="text-xs whitespace-pre-wrap">{error.message || String(error)}</div>
+      </div>
+    );
+  }
+  return (
+    <React.Suspense fallback={null}>
+      <ErrorCatcher setError={setError}>{children}</ErrorCatcher>
+    </React.Suspense>
+  );
+}
+
+class ErrorCatcher extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError(error) { return { hasError: true }; }
+  componentDidCatch(error) { this.props.setError(error); }
+  render() { if (this.state.hasError) return null; return this.props.children; }
+}
+
 const News = () => {
   const [userNews, setUserNews] = useState([]);
   const [showUserNews, setShowUserNews] = useState(true);
@@ -80,84 +105,86 @@ const News = () => {
   };
 
   return (
-    <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-extrabold text-blue-900 mb-8">Market News</h1>
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        {adminNews.length === 0 ? (
-          <div className="col-span-full text-center text-gray-400 text-lg">No admin news available.</div>
-        ) : adminNews.map(news => (
-          <div key={news.id} className="bg-white rounded-xl shadow border p-6 flex flex-col gap-2">
-            <div className="text-blue-800 font-bold text-base mb-1">{news.title}</div>
-            <div className="text-sm text-gray-700 flex-1">{news.summary}</div>
-            <div className="text-xs text-gray-400 mt-2">{news.source} | {news.date}</div>
-          </div>
-        ))}
-      </section>
-      <section className="mt-8">
-        <div className="flex items-center gap-2 mb-2">
-          <h2 className="text-xl font-semibold text-green-800">User News</h2>
-          <label className="flex items-center gap-1 text-xs cursor-pointer">
-            <input type="checkbox" checked={showUserNews} onChange={e => setShowUserNews(e.target.checked)} /> Show
-          </label>
-        </div>
-        {showUserNews && (
-          <>
-            <form className="mb-4 flex flex-wrap gap-4 items-end bg-green-50 rounded-lg px-4 py-3 shadow" onSubmit={editingIdx === null ? handleAdd : handleUpdate}>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Title</label>
-                <input name="title" value={form.title} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-40" placeholder="News Title" required />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Summary</label>
-                <input name="summary" value={form.summary} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-48" placeholder="Short Summary" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Source</label>
-                <input name="source" value={form.source} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-32" placeholder="e.g. MoneyControl" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Date</label>
-                <input name="date" type="date" value={form.date} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-32" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Impact Qtr</label>
-                <select name="impactQtr" value={form.impactQtr} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-20">
-                  <option value="">N/A</option>
-                  <option value="Q1">Q1</option>
-                  <option value="Q2">Q2</option>
-                  <option value="Q3">Q3</option>
-                  <option value="Q4">Q4</option>
-                </select>
-              </div>
-              <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold text-sm transition">
-                {editingIdx === null ? "Add News" : "Update"}
-              </button>
-              {editingIdx !== null && (
-                <button type="button" onClick={() => { setForm({ title: "", summary: "", source: "", date: "", impactQtr: "" }); setEditingIdx(null); }} className="ml-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-semibold">Cancel</button>
-              )}
-            </form>
-            <div className="space-y-3">
-              {userNews.length === 0 ? (
-                <div className="text-gray-500 text-sm">No user news added yet.</div>
-              ) : (
-                userNews.map((news, i) => (
-                  <div key={i} className="bg-white rounded-xl shadow border p-6 flex flex-col gap-2">
-                    <div className="text-green-800 font-bold text-base mb-1">{news.title}</div>
-                    <div className="text-sm text-gray-700 flex-1">{news.summary}</div>
-                    <div className="text-xs text-gray-400 mt-2">{news.source} | {news.date}</div>
-                    <div className="flex gap-2 mt-2">
-                      <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Edit</button>
-                      <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
-                    </div>
-                  </div>
-                ))
-              )}
+    <ErrorBoundary>
+      <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
+        <h1 className="text-3xl font-extrabold text-blue-900 mb-8">Market News</h1>
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          {adminNews.length === 0 ? (
+            <div className="col-span-full text-center text-gray-400 text-lg">No admin news available.</div>
+          ) : adminNews.map(news => (
+            <div key={news.id} className="bg-white rounded-xl shadow border p-6 flex flex-col gap-2">
+              <div className="text-blue-800 font-bold text-base mb-1">{news.title}</div>
+              <div className="text-sm text-gray-700 flex-1">{news.summary}</div>
+              <div className="text-xs text-gray-400 mt-2">{news.source} | {news.date}</div>
             </div>
-          </>
-        )}
-      </section>
-      <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
-    </div>
+          ))}
+        </section>
+        <section className="mt-8">
+          <div className="flex items-center gap-2 mb-2">
+            <h2 className="text-xl font-semibold text-green-800">User News</h2>
+            <label className="flex items-center gap-1 text-xs cursor-pointer">
+              <input type="checkbox" checked={showUserNews} onChange={e => setShowUserNews(e.target.checked)} /> Show
+            </label>
+          </div>
+          {showUserNews && (
+            <>
+              <form className="mb-4 flex flex-wrap gap-4 items-end bg-green-50 rounded-lg px-4 py-3 shadow" onSubmit={editingIdx === null ? handleAdd : handleUpdate}>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Title</label>
+                  <input name="title" value={form.title} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-40" placeholder="News Title" required />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Summary</label>
+                  <input name="summary" value={form.summary} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-48" placeholder="Short Summary" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Source</label>
+                  <input name="source" value={form.source} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-32" placeholder="e.g. MoneyControl" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Date</label>
+                  <input name="date" type="date" value={form.date} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-32" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Impact Qtr</label>
+                  <select name="impactQtr" value={form.impactQtr} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-20">
+                    <option value="">N/A</option>
+                    <option value="Q1">Q1</option>
+                    <option value="Q2">Q2</option>
+                    <option value="Q3">Q3</option>
+                    <option value="Q4">Q4</option>
+                  </select>
+                </div>
+                <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-semibold text-sm transition">
+                  {editingIdx === null ? "Add News" : "Update"}
+                </button>
+                {editingIdx !== null && (
+                  <button type="button" onClick={() => { setForm({ title: "", summary: "", source: "", date: "", impactQtr: "" }); setEditingIdx(null); }} className="ml-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-semibold">Cancel</button>
+                )}
+              </form>
+              <div className="space-y-3">
+                {userNews.length === 0 ? (
+                  <div className="text-gray-500 text-sm">No user news added yet.</div>
+                ) : (
+                  userNews.map((news, i) => (
+                    <div key={i} className="bg-white rounded-xl shadow border p-6 flex flex-col gap-2">
+                      <div className="text-green-800 font-bold text-base mb-1">{news.title}</div>
+                      <div className="text-sm text-gray-700 flex-1">{news.summary}</div>
+                      <div className="text-xs text-gray-400 mt-2">{news.source} | {news.date}</div>
+                      <div className="flex gap-2 mt-2">
+                        <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Edit</button>
+                        <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </section>
+        <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
+      </div>
+    </ErrorBoundary>
   );
 };
 

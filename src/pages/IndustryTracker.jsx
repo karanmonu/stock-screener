@@ -136,81 +136,106 @@ const industries = [
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28CFF", "#FF6F91"];
 
-const IndustryTracker = () => {
+// --- Global error boundary for IndustryTracker page ---
+function ErrorBoundary({ children }) {
+  const [error, setError] = React.useState(null);
+  if (error) {
+    return (
+      <div className="bg-red-100 border-l-4 border-red-600 text-red-800 p-4 my-6 rounded">
+        <div className="font-bold mb-2">Something went wrong in Industry Tracker:</div>
+        <div className="text-xs whitespace-pre-wrap">{error.message || String(error)}</div>
+      </div>
+    );
+  }
+  return (
+    <React.Suspense fallback={null}>
+      <ErrorCatcher setError={setError}>{children}</ErrorCatcher>
+    </React.Suspense>
+  );
+}
+
+class ErrorCatcher extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError(error) { return { hasError: true }; }
+  componentDidCatch(error) { this.props.setError(error); }
+  render() { if (this.state.hasError) return null; return this.props.children; }
+}
+
+export default function IndustryTracker(props) {
   const [selected, setSelected] = useState(industries[0].key);
   const navigate = useNavigate();
   const industry = industries.find(i => i.key === selected);
 
   return (
-    <main className="w-full py-8 px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 bg-gray-50 min-h-screen">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-blue-900">Industry Tracker</h1>
-        <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
-      </div>
-      <div className="mb-6 flex gap-4 flex-wrap">
-        {industries.map(i => (
-          <button
-            key={i.key}
-            className={`px-4 py-2 rounded-lg font-semibold border transition ${selected === i.key ? "bg-blue-600 text-white border-blue-700" : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"}`}
-            onClick={() => setSelected(i.key)}
-          >
-            {i.name}
-          </button>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-14 2xl:gap-16">
-        {/* Seasonality */}
-        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
-          <h2 className="text-lg font-bold mb-4 text-blue-800">Seasonality</h2>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={industry.seasonality}>
-              <XAxis dataKey={industry.key === "auto" ? "month" : industry.key === "energy" ? "quarter" : "quarter"} />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey={industry.key === "auto" ? "sales" : industry.key === "energy" ? "gen" : "sales"} fill="#0088FE" />
-            </BarChart>
-          </ResponsiveContainer>
+    <ErrorBoundary>
+      <main className="w-full py-8 px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 bg-gray-50 min-h-screen">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-blue-900">Industry Tracker</h1>
+          <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
         </div>
-        {/* Market Leader */}
-        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
-          <h2 className="text-lg font-bold mb-4 text-blue-800">Market Leaders</h2>
-          <ResponsiveContainer width="100%" height={320}>
-            <PieChart>
-              <Pie data={industry.marketLeaders} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
-                {industry.marketLeaders.map((entry, idx) => (
-                  <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+        <div className="mb-6 flex gap-4 flex-wrap">
+          {industries.map(i => (
+            <button
+              key={i.key}
+              className={`px-4 py-2 rounded-lg font-semibold border transition ${selected === i.key ? "bg-blue-600 text-white border-blue-700" : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"}`}
+              onClick={() => setSelected(i.key)}
+            >
+              {i.name}
+            </button>
+          ))}
         </div>
-        {/* Raw Material Dependence */}
-        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
-          <h2 className="text-lg font-bold mb-4 text-blue-800">Raw Material Dependence</h2>
-          <ResponsiveContainer width="100%" height={320}>
-            <PieChart>
-              <Pie data={industry.rawMaterials} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
-                {industry.rawMaterials.map((entry, idx) => (
-                  <Cell key={`cell-raw-${idx}`} fill={COLORS[idx % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        {/* Geo Political Impact */}
-        <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
-          <h2 className="text-lg font-bold mb-4 text-blue-800">Geo-Political Impact</h2>
-          <div className="flex-1 flex items-center justify-center">
-            <span className="text-base text-gray-700 text-center">{industry.geoImpact}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-14 2xl:gap-16">
+          {/* Seasonality */}
+          <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+            <h2 className="text-lg font-bold mb-4 text-blue-800">Seasonality</h2>
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={industry.seasonality}>
+                <XAxis dataKey={industry.key === "auto" ? "month" : industry.key === "energy" ? "quarter" : "quarter"} />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey={industry.key === "auto" ? "sales" : industry.key === "energy" ? "gen" : "sales"} fill="#0088FE" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Market Leader */}
+          <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+            <h2 className="text-lg font-bold mb-4 text-blue-800">Market Leaders</h2>
+            <ResponsiveContainer width="100%" height={320}>
+              <PieChart>
+                <Pie data={industry.marketLeaders} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
+                  {industry.marketLeaders.map((entry, idx) => (
+                    <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Legend />
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Raw Material Dependence */}
+          <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+            <h2 className="text-lg font-bold mb-4 text-blue-800">Raw Material Dependence</h2>
+            <ResponsiveContainer width="100%" height={320}>
+              <PieChart>
+                <Pie data={industry.rawMaterials} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
+                  {industry.rawMaterials.map((entry, idx) => (
+                    <Cell key={`cell-raw-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Legend />
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Geo Political Impact */}
+          <div className="bg-white rounded-xl shadow border p-6 flex flex-col min-h-[400px]">
+            <h2 className="text-lg font-bold mb-4 text-blue-800">Geo-Political Impact</h2>
+            <div className="flex-1 flex items-center justify-center">
+              <span className="text-base text-gray-700 text-center">{industry.geoImpact}</span>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </ErrorBoundary>
   );
-};
-
-export default IndustryTracker;
+}

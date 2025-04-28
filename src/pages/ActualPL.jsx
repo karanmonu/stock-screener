@@ -90,6 +90,31 @@ function calcTxnCharges(txn) {
   return { netPL, returnPct };
 }
 
+// --- Global error boundary for ActualPL page ---
+function ErrorBoundary({ children }) {
+  const [error, setError] = React.useState(null);
+  if (error) {
+    return (
+      <div className="bg-red-100 border-l-4 border-red-600 text-red-800 p-4 my-6 rounded">
+        <div className="font-bold mb-2">Something went wrong in Actual P&L:</div>
+        <div className="text-xs whitespace-pre-wrap">{error.message || String(error)}</div>
+      </div>
+    );
+  }
+  return (
+    <React.Suspense fallback={null}>
+      <ErrorCatcher setError={setError}>{children}</ErrorCatcher>
+    </React.Suspense>
+  );
+}
+
+class ErrorCatcher extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError(error) { return { hasError: true }; }
+  componentDidCatch(error) { this.props.setError(error); }
+  render() { if (this.state.hasError) return null; return this.props.children; }
+}
+
 const ActualPL = () => {
   const [txns, setTxns] = useState([]);
   const [form, setForm] = useState(defaultTxn);
@@ -349,4 +374,10 @@ const ActualPL = () => {
   );
 };
 
-export default ActualPL;
+export default function ActualPL(props) {
+  return (
+    <ErrorBoundary>
+      <ActualPL />
+    </ErrorBoundary>
+  );
+}
