@@ -80,31 +80,20 @@ const News = () => {
   };
 
   return (
-    <main className="max-w-4xl mx-auto py-10 px-2 md:px-0">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-blue-900">Market News</h1>
-        <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
-      </div>
-      {/* Admin News */}
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold text-blue-800 mb-4">Admin News</h2>
-        <div className="space-y-4">
-          {adminNews.map(news => (
-            <div key={news.id} className="bg-white rounded-lg shadow px-4 py-3 border-l-4 border-blue-400 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-blue-700">{news.title}</span>
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">{news.impactQtr}</span>
-                </div>
-                <div className="text-gray-700 text-sm mb-1">{news.summary}</div>
-                <div className="text-xs text-gray-500">{news.source} | {news.date}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-extrabold text-blue-900 mb-8">Market News</h1>
+      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        {adminNews.length === 0 ? (
+          <div className="col-span-full text-center text-gray-400 text-lg">No admin news available.</div>
+        ) : adminNews.map(news => (
+          <div key={news.id} className="bg-white rounded-xl shadow border p-6 flex flex-col gap-2">
+            <div className="text-blue-800 font-bold text-base mb-1">{news.title}</div>
+            <div className="text-sm text-gray-700 flex-1">{news.summary}</div>
+            <div className="text-xs text-gray-400 mt-2">{news.source} | {news.date}</div>
+          </div>
+        ))}
       </section>
-      {/* User News */}
-      <section className="mb-8">
+      <section className="mt-8">
         <div className="flex items-center gap-2 mb-2">
           <h2 className="text-xl font-semibold text-green-800">User News</h2>
           <label className="flex items-center gap-1 text-xs cursor-pointer">
@@ -152,16 +141,11 @@ const News = () => {
                 <div className="text-gray-500 text-sm">No user news added yet.</div>
               ) : (
                 userNews.map((news, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow px-4 py-3 border-l-4 border-green-400 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-green-700">{news.title}</span>
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded font-semibold">{news.impactQtr || "N/A"}</span>
-                      </div>
-                      <div className="text-gray-700 text-sm mb-1">{news.summary}</div>
-                      <div className="text-xs text-gray-500">{news.source} | {news.date}</div>
-                    </div>
-                    <div className="flex gap-2">
+                  <div key={i} className="bg-white rounded-xl shadow border p-6 flex flex-col gap-2">
+                    <div className="text-green-800 font-bold text-base mb-1">{news.title}</div>
+                    <div className="text-sm text-gray-700 flex-1">{news.summary}</div>
+                    <div className="text-xs text-gray-400 mt-2">{news.source} | {news.date}</div>
+                    <div className="flex gap-2 mt-2">
                       <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Edit</button>
                       <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
                     </div>
@@ -172,7 +156,8 @@ const News = () => {
           </>
         )}
       </section>
-    </main>
+      <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
+    </div>
   );
 };
 

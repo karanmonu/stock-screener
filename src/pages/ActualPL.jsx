@@ -148,140 +148,134 @@ const ActualPL = () => {
   const { summary, realizedPL, unrealizedPL, invested } = calcActualPL(txns);
 
   return (
-    <main className="max-w-5xl mx-auto py-10 px-2 md:px-0">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-blue-900">Actual Profit & Loss</h1>
-        <div className="flex gap-2">
-          <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
-          <button className="text-orange-700 border border-orange-300 bg-orange-50 hover:bg-orange-100 rounded px-3 py-1 text-xs font-semibold ml-2" onClick={handleExportCSV} type="button">Export CSV</button>
-          <label className="text-orange-700 border border-orange-300 bg-orange-50 hover:bg-orange-100 rounded px-3 py-1 text-xs font-semibold ml-2 cursor-pointer">
-            Import CSV
-            <input type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
-          </label>
-        </div>
-      </div>
-      <div className="bg-blue-50 rounded-lg px-6 py-4 mb-6 flex flex-wrap gap-8 items-center shadow">
-        <div>
-          <div className="text-xs text-gray-600">Total Invested</div>
-          <div className="text-lg font-bold">₹{invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-600">Realized P&L</div>
-          <div className={`text-lg font-bold ${realizedPL >= 0 ? "text-green-600" : "text-red-600"}`}>₹{realizedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-600">Unrealized P&L</div>
-          <div className={`text-lg font-bold ${unrealizedPL >= 0 ? "text-green-600" : "text-red-600"}`}>₹{unrealizedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
-        </div>
-      </div>
-      <form className="mb-8 flex flex-wrap gap-4 items-end bg-white rounded-lg px-6 py-4 shadow" onSubmit={editingIdx === null ? handleAdd : handleUpdate}>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Symbol</label>
-          <input name="symbol" value={form.symbol} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-28" placeholder="e.g. RELIANCE" required />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Buy/Sell</label>
-          <select name="action" value={form.action} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-20">
-            <option value="Buy">Buy</option>
-            <option value="Sell">Sell</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Quantity</label>
-          <input name="quantity" type="number" value={form.quantity} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-20" required />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Price</label>
-          <input name="price" type="number" value={form.price} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" required />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Date</label>
-          <input name="date" type="date" value={form.date} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-32" />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Brokerage/Fees</label>
-          <input name="fees" type="number" value={form.fees} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" placeholder="0" />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Notes</label>
-          <input name="notes" value={form.notes} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-40" placeholder="Optional notes" />
-        </div>
-        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold text-sm transition">
-          {editingIdx === null ? "Add Txn" : "Update"}
-        </button>
-        {editingIdx !== null && (
-          <button type="button" onClick={() => { setForm(defaultTxn); setEditingIdx(null); }} className="ml-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-semibold">Cancel</button>
-        )}
-      </form>
-      <div className="bg-white rounded-2xl shadow-lg overflow-x-auto border border-blue-100 mb-8">
-        <table className="min-w-full text-xs md:text-sm">
+    <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-extrabold text-blue-900 mb-8">Actual Portfolio P&amp;L</h1>
+      <section className="bg-white rounded-xl shadow border p-6 mb-10 overflow-x-auto">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Holdings</h2>
+        <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-blue-100 text-blue-900">
-              <th className="px-2 py-2">Symbol</th>
-              <th className="px-2 py-2">Buy/Sell</th>
-              <th className="px-2 py-2">Qty</th>
-              <th className="px-2 py-2">Price</th>
-              <th className="px-2 py-2">Date</th>
-              <th className="px-2 py-2">Fees</th>
-              <th className="px-2 py-2">Notes</th>
-              <th className="px-2 py-2">Actions</th>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Stock</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Qty</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Buy Price</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Current Price</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">P&amp;L</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Actions</th>
             </tr>
           </thead>
           <tbody>
             {txns.length === 0 ? (
-              <tr><td colSpan={8} className="text-center text-gray-400 py-4">No transactions yet.</td></tr>
-            ) : (
-              txns.map((txn, i) => (
-                <tr key={i} className="odd:bg-white even:bg-blue-50">
-                  <td className="px-2 py-2 font-semibold text-blue-800">{txn.symbol}</td>
-                  <td className="px-2 py-2">{txn.action}</td>
-                  <td className="px-2 py-2">{txn.quantity}</td>
-                  <td className="px-2 py-2">{txn.price}</td>
-                  <td className="px-2 py-2">{txn.date}</td>
-                  <td className="px-2 py-2">{txn.fees}</td>
-                  <td className="px-2 py-2 max-w-xs truncate" title={txn.notes}>{txn.notes}</td>
-                  <td className="px-2 py-2">
-                    <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold mr-1">Edit</button>
-                    <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
-                  </td>
-                </tr>
-              ))
-            )}
+              <tr><td colSpan={6} className="text-center text-gray-400 py-8 text-lg">No holdings yet.</td></tr>
+            ) : txns.map((txn, i) => (
+              <tr key={i} className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition">
+                <td className="px-4 py-3 font-semibold text-blue-700">{txn.symbol}</td>
+                <td className="px-4 py-3">{txn.quantity}</td>
+                <td className="px-4 py-3">{txn.price}</td>
+                <td className="px-4 py-3">{getCurrentPrice(txn.symbol)}</td>
+                <td className={"px-4 py-3 font-bold " + (parseFloat(txn.price) < getCurrentPrice(txn.symbol) ? "text-green-600" : parseFloat(txn.price) > getCurrentPrice(txn.symbol) ? "text-red-600" : "text-gray-700")}>{parseFloat(txn.price) - getCurrentPrice(txn.symbol)}</td>
+                <td className="px-4 py-3">
+                  <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold mr-1">Edit</button>
+                  <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
-      </div>
-      <div className="bg-white rounded-2xl shadow-lg overflow-x-auto border border-blue-100">
-        <h2 className="text-lg font-bold text-blue-800 px-4 pt-4">Position Summary</h2>
-        <table className="min-w-full text-xs md:text-sm mb-4">
+      </section>
+      <section className="bg-white rounded-xl shadow border p-6 mb-10 overflow-x-auto">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Add/Edit Transaction</h2>
+        <form className="flex flex-wrap gap-4 items-end" onSubmit={editingIdx === null ? handleAdd : handleUpdate}>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Symbol</label>
+            <input name="symbol" value={form.symbol} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-28" placeholder="e.g. RELIANCE" required />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Buy/Sell</label>
+            <select name="action" value={form.action} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-20">
+              <option value="Buy">Buy</option>
+              <option value="Sell">Sell</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Quantity</label>
+            <input name="quantity" type="number" value={form.quantity} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-20" required />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Price</label>
+            <input name="price" type="number" value={form.price} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" required />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Date</label>
+            <input name="date" type="date" value={form.date} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-32" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Brokerage/Fees</label>
+            <input name="fees" type="number" value={form.fees} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" placeholder="0" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Notes</label>
+            <input name="notes" value={form.notes} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-40" placeholder="Optional notes" />
+          </div>
+          <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold text-sm transition">
+            {editingIdx === null ? "Add Txn" : "Update"}
+          </button>
+          {editingIdx !== null && (
+            <button type="button" onClick={() => { setForm(defaultTxn); setEditingIdx(null); }} className="ml-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-semibold">Cancel</button>
+          )}
+        </form>
+      </section>
+      <section className="bg-white rounded-xl shadow border p-6 mb-10 overflow-x-auto">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Import/Export</h2>
+        <button className="text-orange-700 border border-orange-300 bg-orange-50 hover:bg-orange-100 rounded px-3 py-1 text-xs font-semibold ml-2" onClick={handleExportCSV} type="button">Export CSV</button>
+        <label className="text-orange-700 border border-orange-300 bg-orange-50 hover:bg-orange-100 rounded px-3 py-1 text-xs font-semibold ml-2 cursor-pointer">
+          Import CSV
+          <input type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
+        </label>
+      </section>
+      <section className="bg-white rounded-xl shadow border p-6 mb-10 overflow-x-auto">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Summary</h2>
+        <div className="flex gap-4 items-center mb-4">
+          <div>
+            <div className="text-xs text-gray-600">Total Invested</div>
+            <div className="text-lg font-bold">₹{invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-600">Realized P&amp;L</div>
+            <div className={`text-lg font-bold ${realizedPL >= 0 ? "text-green-600" : "text-red-600"}`}>₹{realizedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-600">Unrealized P&amp;L</div>
+            <div className={`text-lg font-bold ${unrealizedPL >= 0 ? "text-green-600" : "text-red-600"}`}>₹{unrealizedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+          </div>
+        </div>
+        <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-blue-50 text-blue-900">
-              <th className="px-2 py-2">Symbol</th>
-              <th className="px-2 py-2">Qty Held</th>
-              <th className="px-2 py-2">Avg Buy</th>
-              <th className="px-2 py-2">Invested</th>
-              <th className="px-2 py-2">Unrealized P&L</th>
-              <th className="px-2 py-2">Realized P&L</th>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Symbol</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Qty Held</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Avg Buy</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Invested</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Unrealized P&amp;L</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Realized P&amp;L</th>
             </tr>
           </thead>
           <tbody>
             {Object.keys(summary).length === 0 ? (
-              <tr><td colSpan={6} className="text-center text-gray-400 py-4">No positions yet.</td></tr>
-            ) : (
-              Object.keys(summary).map(symbol => (
-                <tr key={symbol} className="odd:bg-white even:bg-blue-50">
-                  <td className="px-2 py-2 font-semibold text-blue-800">{symbol}</td>
-                  <td className="px-2 py-2">{summary[symbol].qty}</td>
-                  <td className="px-2 py-2">{summary[symbol].avgBuy.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                  <td className="px-2 py-2">{summary[symbol].invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                  <td className={`px-2 py-2 ${summary[symbol].unrealized >= 0 ? "text-green-600" : "text-red-600"}`}>{summary[symbol].unrealized.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                  <td className={`px-2 py-2 ${summary[symbol].realized >= 0 ? "text-green-600" : "text-red-600"}`}>{summary[symbol].realized.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                </tr>
-              ))
-            )}
+              <tr><td colSpan={6} className="text-center text-gray-400 py-8 text-lg">No positions yet.</td></tr>
+            ) : Object.keys(summary).map(symbol => (
+              <tr key={symbol} className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition">
+                <td className="px-4 py-3 font-semibold text-blue-700">{symbol}</td>
+                <td className="px-4 py-3">{summary[symbol].qty}</td>
+                <td className="px-4 py-3">{summary[symbol].avgBuy.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                <td className="px-4 py-3">{summary[symbol].invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                <td className={"px-4 py-3 font-bold " + (summary[symbol].unrealized >= 0 ? "text-green-600" : "text-red-600")}>{summary[symbol].unrealized.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                <td className={"px-4 py-3 font-bold " + (summary[symbol].realized >= 0 ? "text-green-600" : "text-red-600")}>{summary[symbol].realized.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
-      </div>
-    </main>
+      </section>
+    </div>
   );
 };
 

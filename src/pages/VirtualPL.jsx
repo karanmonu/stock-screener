@@ -110,27 +110,49 @@ const VirtualPL = () => {
   );
 
   return (
-    <main className="max-w-4xl mx-auto py-10 px-2 md:px-0">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-blue-900">Virtual Profit & Loss</h1>
-        <button className="text-blue-600 underline text-sm" onClick={() => navigate("/")}>← Back to Dashboard</button>
-      </div>
-      <div className="bg-blue-50 rounded-lg px-6 py-4 mb-6 flex flex-wrap gap-8 items-center shadow">
-        <div>
-          <div className="text-xs text-gray-600">Total Invested</div>
-          <div className="text-lg font-bold">₹{summary.invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-600">Current Value</div>
-          <div className="text-lg font-bold">₹{summary.currentValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-600">Total P&L</div>
-          <div className={`text-lg font-bold ${summary.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
-            ₹{summary.profit.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-          </div>
-        </div>
-      </div>
+    <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-extrabold text-blue-900 mb-8">Virtual Portfolio P&amp;L</h1>
+      <section className="bg-white rounded-xl shadow border p-6 mb-10 overflow-x-auto">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Holdings</h2>
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Stock</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Qty</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Buy Price</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Current Price</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">P&amp;L</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Invested</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Current Value</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">%P&amp;L</th>
+              <th className="px-4 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {holdings.length === 0 ? (
+              <tr><td colSpan={9} className="text-center text-gray-400 py-8 text-lg">No holdings yet.</td></tr>
+            ) : holdings.map((h, i) => {
+              const { invested, currentValue, profit, percent, currentPrice } = calcPL(h);
+              return (
+                <tr key={i} className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition">
+                  <td className="px-4 py-3 font-semibold text-blue-700">{h.symbol}</td>
+                  <td className="px-4 py-3">{h.quantity}</td>
+                  <td className="px-4 py-3">{h.buyPrice}</td>
+                  <td className="px-4 py-3">{currentPrice}</td>
+                  <td className={`px-4 py-3 font-bold ${profit >= 0 ? "text-green-600" : "text-red-600"}`}>{profit.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-3">{invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-3">{currentValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                  <td className={`px-4 py-3 font-bold ${percent >= 0 ? "text-green-600" : "text-red-600"}`}>{percent.toFixed(2)}%</td>
+                  <td className="px-4 py-3 flex gap-2">
+                    <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Edit</button>
+                    <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
       <form className="mb-8 flex flex-wrap gap-4 items-end bg-white rounded-lg px-6 py-4 shadow" onSubmit={editingIdx === null ? handleAdd : handleUpdate} autoComplete="off">
         <div className="relative">
           <label className="block text-xs font-semibold text-gray-700 mb-1">Symbol</label>
@@ -183,49 +205,21 @@ const VirtualPL = () => {
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-gradient-to-r from-blue-50 to-blue-100">
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">Symbol</th>
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">Buy Price</th>
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">Qty</th>
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">Buy Date</th>
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">Current Price</th>
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">Invested</th>
+              <th className="px-4 py-3 text-left font-semibold text-blue-800">Total Invested</th>
               <th className="px-4 py-3 text-left font-semibold text-blue-800">Current Value</th>
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">P&L</th>
-              <th className="px-4 py-3 text-left font-semibold text-blue-800">%P&L</th>
-              <th className="px-4 py-3"></th>
+              <th className="px-4 py-3 text-left font-semibold text-blue-800">Total P&amp;L</th>
             </tr>
           </thead>
           <tbody>
-            {holdings.length === 0 ? (
-              <tr>
-                <td colSpan={10} className="text-center text-gray-400 py-8 text-lg">No holdings yet.</td>
-              </tr>
-            ) : (
-              holdings.map((h, i) => {
-                const { invested, currentValue, profit, percent, currentPrice } = calcPL(h);
-                return (
-                  <tr key={i} className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition">
-                    <td className="px-4 py-3 font-semibold text-blue-700">{h.symbol}</td>
-                    <td className="px-4 py-3">₹{h.buyPrice}</td>
-                    <td className="px-4 py-3">{h.quantity}</td>
-                    <td className="px-4 py-3">{h.date || "-"}</td>
-                    <td className="px-4 py-3">₹{currentPrice}</td>
-                    <td className="px-4 py-3">₹{invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                    <td className="px-4 py-3">₹{currentValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                    <td className={`px-4 py-3 font-bold ${profit >= 0 ? "text-green-600" : "text-red-600"}`}>₹{profit.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                    <td className={`px-4 py-3 font-bold ${percent >= 0 ? "text-green-600" : "text-red-600"}`}>{percent.toFixed(2)}%</td>
-                    <td className="px-4 py-3 flex gap-2">
-                      <button onClick={() => handleEdit(i)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold">Edit</button>
-                      <button onClick={() => handleDelete(i)} className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">Delete</button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
+            <tr>
+              <td className="px-4 py-3">₹{summary.invested.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+              <td className="px-4 py-3">₹{summary.currentValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+              <td className={`px-4 py-3 font-bold ${summary.profit >= 0 ? "text-green-600" : "text-red-600"}`}>₹{summary.profit.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+            </tr>
           </tbody>
         </table>
       </div>
-    </main>
+    </div>
   );
 };
 

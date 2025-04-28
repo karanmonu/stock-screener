@@ -115,95 +115,45 @@ const Dashboard = () => {
   }
 
   return (
-    <main className="max-w-6xl mx-auto py-10 px-2 md:px-0">
+    <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-        <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">Top Indian Stocks</h1>
-        <div className="flex gap-2 items-center">
-          <input
-            type="text"
-            className="border border-blue-300 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-            placeholder="🔍 Search by name or symbol..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <button onClick={resetFilters} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-sm font-semibold transition">Reset Filters</button>
-          <button onClick={() => navigate('/virtual-pl')} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition ml-2">Virtual P&amp;L</button>
-          <button onClick={() => navigate('/actual-pl')} className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold transition ml-2">Actual P&amp;L</button>
-          <button onClick={() => navigate('/leads')} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition ml-2">Leads Tracker</button>
-          <button onClick={() => navigate('/industry-tracker')} className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition ml-2">Industry Tracker</button>
+        <h1 className="text-3xl font-extrabold text-blue-900 tracking-tight">Dashboard</h1>
+        <div className="flex flex-wrap gap-2 md:gap-4">
+          <button onClick={() => navigate('/virtual-pl')} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition shadow">Virtual P&amp;L</button>
+          <button onClick={() => navigate('/actual-pl')} className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold transition shadow">Actual P&amp;L</button>
+          <button onClick={() => navigate('/leads')} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow">Leads Tracker</button>
+          <button onClick={() => navigate('/industry-tracker')} className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition shadow">Industry Tracker</button>
         </div>
       </div>
-      {/* WATCHLIST SECTION */}
-      <div className="mb-6">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 shadow-sm">
-          <h2 className="font-bold text-yellow-800 text-lg mb-2 flex items-center gap-2">⭐ My Watchlist</h2>
-          {watchlist.length === 0 ? (
-            <div className="text-gray-500 text-sm">No stocks in your watchlist. Click the star on a stock to add.</div>
-          ) : (
-            <div className="flex flex-wrap gap-3">
-              {watchlist.map(symbol => {
-                const stock = mockStocks.find(s => s.id === symbol);
-                const redFlags = stock ? getRedFlags(stock.metrics) : [];
-                return stock ? (
-                  <div key={symbol} className="flex items-center gap-2 bg-white border border-yellow-200 px-3 py-1 rounded shadow-sm">
-                    <span className="font-semibold text-yellow-800">{stock.name} <span className="text-xs text-gray-400">({symbol})</span></span>
-                    {redFlags.length > 0 && <span className="ml-1 text-red-600" title="Red Flags Detected">⚠️</span>}
-                    <button onClick={() => removeFromWatchlist(symbol)} className="text-xs px-2 py-0.5 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-900 font-bold">✕</button>
-                  </div>
-                ) : null;
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-      {/* NEWS GLIMPSE SECTION */}
-      <div className="mb-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-bold text-blue-800 text-lg flex items-center gap-2">📰 Latest News</h2>
-            <button onClick={() => navigate('/news')} className="text-blue-600 underline text-xs font-semibold">See All</button>
-          </div>
-          <div className="space-y-2">
-            {adminNews.slice(0, 3).map(news => (
-              <div key={news.id} className="flex items-center gap-2">
-                <span className="font-semibold text-blue-700">{news.title}</span>
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">{news.impactQtr}</span>
-                <span className="text-xs text-gray-400">{news.date}</span>
+      {/* Watchlist Section */}
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">My Watchlist</h2>
+        <div className="flex flex-wrap gap-3">
+          {watchlist.map(symbol => {
+            const stock = mockStocks.find(s => s.id === symbol);
+            const redFlags = stock ? getRedFlags(stock.metrics) : [];
+            return stock ? (
+              <div key={symbol} className="flex items-center gap-2 bg-white border border-yellow-200 px-3 py-1 rounded shadow-sm">
+                <span className="font-semibold text-yellow-800">{stock.name} <span className="text-xs text-gray-400">({symbol})</span></span>
+                {redFlags.length > 0 && <span className="ml-1 text-red-600" title="Red Flags Detected">⚠️</span>}
+                <button onClick={() => removeFromWatchlist(symbol)} className="text-xs px-2 py-0.5 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-900 font-bold">✕</button>
               </div>
-            ))}
-          </div>
+            ) : null;
+          })}
         </div>
-      </div>
-      <div className="mb-6 flex flex-wrap gap-4 items-center bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 shadow-sm">
-        <div className="flex gap-2 items-center">
-          <span className="text-xs text-blue-900 font-semibold">Price:</span>
-          <input type="number" min={priceMinDefault} max={priceMaxDefault} value={priceMin} onChange={e => setPriceMin(e.target.value)} placeholder={`Min (${priceMinDefault})`} className="w-20 border border-blue-200 rounded px-2 py-1 text-xs focus:border-blue-400" />
-          <span className="text-gray-400">-</span>
-          <input type="number" min={priceMinDefault} max={priceMaxDefault} value={priceMax} onChange={e => setPriceMax(e.target.value)} placeholder={`Max (${priceMaxDefault})`} className="w-20 border border-blue-200 rounded px-2 py-1 text-xs focus:border-blue-400" />
-        </div>
-        <div className="flex gap-2 items-center">
-          <span className="text-xs text-blue-900 font-semibold">PE:</span>
-          <input type="number" min={peMinDefault} max={peMaxDefault} value={peMin} onChange={e => setPeMin(e.target.value)} placeholder={`Min (${peMinDefault})`} className="w-16 border border-blue-200 rounded px-2 py-1 text-xs focus:border-blue-400" />
-          <span className="text-gray-400">-</span>
-          <input type="number" min={peMinDefault} max={peMaxDefault} value={peMax} onChange={e => setPeMax(e.target.value)} placeholder={`Max (${peMaxDefault})`} className="w-16 border border-blue-200 rounded px-2 py-1 text-xs focus:border-blue-400" />
-        </div>
-        <div className="flex gap-2 items-center">
-          <span className="text-xs text-blue-900 font-semibold">Mkt Cap:</span>
-          <input type="number" min={mcMinDefault} max={mcMaxDefault} value={mcMin} onChange={e => setMcMin(e.target.value)} placeholder={`Min (${mcMinDefault})`} className="w-28 border border-blue-200 rounded px-2 py-1 text-xs focus:border-blue-400" />
-          <span className="text-gray-400">-</span>
-          <input type="number" min={mcMinDefault} max={mcMaxDefault} value={mcMax} onChange={e => setMcMax(e.target.value)} placeholder={`Max (${mcMaxDefault})`} className="w-28 border border-blue-200 rounded px-2 py-1 text-xs focus:border-blue-400" />
-        </div>
-      </div>
-      <div className="bg-white rounded-2xl shadow-lg overflow-x-auto border border-blue-100">
+      </section>
+      {/* Main Table Section */}
+      <section className="bg-white rounded-xl shadow border p-4 mb-10 overflow-x-auto">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Market Overview</h2>
         <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-gradient-to-r from-blue-50 to-blue-100">
-              <th className="px-4 py-3 text-left cursor-pointer select-none font-semibold text-blue-800" onClick={() => handleSort('name')}>Name {sortBy === 'name' && (sortDir === 'asc' ? '▲' : '▼')}</th>
-              <th className="px-4 py-3 text-left cursor-pointer select-none font-semibold text-blue-800" onClick={() => handleSort('price')}>Price (₹) {sortBy === 'price' && (sortDir === 'asc' ? '▲' : '▼')}</th>
-              <th className="px-4 py-3 text-left cursor-pointer select-none font-semibold text-blue-800" onClick={() => handleSort('change')}>Change (%) {sortBy === 'change' && (sortDir === 'asc' ? '▲' : '▼')}</th>
-              <th className="px-4 py-3 text-left cursor-pointer select-none font-semibold text-blue-800" onClick={() => handleSort('marketCap')}>Market Cap (Cr) {sortBy === 'marketCap' && (sortDir === 'asc' ? '▲' : '▼')}</th>
-              <th className="px-4 py-3 text-left cursor-pointer select-none font-semibold text-blue-800" onClick={() => handleSort('pe')}>PE {sortBy === 'pe' && (sortDir === 'asc' ? '▲' : '▼')}</th>
-              <th className="px-4 py-3"></th>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Stock</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Price</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Change</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">Market Cap</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700">PE</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700"></th>
             </tr>
           </thead>
           <tbody>
@@ -245,8 +195,21 @@ const Dashboard = () => {
             )}
           </tbody>
         </table>
-      </div>
-    </main>
+      </section>
+      {/* News Section */}
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Latest News</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {adminNews.slice(0, 6).map((news, idx) => (
+            <div key={news.id} className="bg-white rounded-xl shadow border p-4 flex flex-col gap-2">
+              <div className="text-blue-800 font-bold text-base mb-1">{news.title}</div>
+              <div className="text-sm text-gray-700 flex-1">{news.content.length > 100 ? news.content.slice(0, 100) + '…' : news.content}</div>
+              <div className="text-xs text-gray-400 mt-2">{news.date}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 };
 
