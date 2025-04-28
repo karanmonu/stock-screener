@@ -16,7 +16,9 @@ function AppShell({ children }) {
       <header className="w-full bg-white shadow sticky top-0 z-30">
         <nav className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-xl font-extrabold text-blue-700 tracking-tight">Fintellect</span>
+            <a href="/" className="focus:outline-none">
+              <span className="text-xl font-extrabold text-blue-700 tracking-tight">Fintellect</span>
+            </a>
             <span className="text-xs text-gray-400 font-semibold ml-2">Smart Indian Stock Suite</span>
           </div>
           <div className="flex gap-4">
@@ -25,6 +27,7 @@ function AppShell({ children }) {
             <a href="/industry-tracker" className="hover:text-blue-700 font-semibold text-gray-700 transition">Industry Tracker</a>
             <a href="/leads" className="hover:text-blue-700 font-semibold text-gray-700 transition">Leads</a>
             <a href="/news" className="hover:text-blue-700 font-semibold text-gray-700 transition">News</a>
+            <a href="/watchlist" className="hover:text-blue-700 font-semibold text-gray-700 transition">Watchlist</a>
           </div>
         </nav>
       </header>
@@ -48,6 +51,7 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/leads" element={<LeadsTracker />} />
           <Route path="/industry-tracker" element={<IndustryTracker />} />
+          <Route path="/watchlist" element={<React.Suspense fallback={null}>{React.createElement(require("./pages/Watchlist").default)}</React.Suspense>} />
         </Routes>
       </BrowserRouter>
     </AppShell>

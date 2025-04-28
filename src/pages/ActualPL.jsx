@@ -23,8 +23,6 @@ const defaultTxn = {
   sebiFee: "",
   stt: "",
   otherCharges: "",
-  returnPct: "",
-  fees: "",
   notes: ""
 };
 
@@ -72,6 +70,24 @@ function calcActualPL(transactions) {
     }
   });
   return { summary, realizedPL, unrealizedPL, invested };
+}
+
+// --- Helper to calculate all charges and net P&L for a transaction ---
+function calcTxnCharges(txn) {
+  // Parse all fields as numbers (default to 0)
+  const buy = Number(txn.price) || 0;
+  const sale = txn.action === "Sell" ? Number(txn.price) || 0 : 0;
+  const brokerage = Number(txn.brokerage) || 0;
+  const gst = Number(txn.gst) || 0;
+  const stampDuty = Number(txn.stampDuty) || 0;
+  const sebiFee = Number(txn.sebiFee) || 0;
+  const stt = Number(txn.stt) || 0;
+  const otherCharges = Number(txn.otherCharges) || 0;
+  // Net P&L = Sale - Buy - (all charges)
+  const netPL = sale - buy - (brokerage + gst + stampDuty + sebiFee + stt + otherCharges);
+  // Return % = (Net P&L) / Buy * 100
+  const returnPct = buy ? ((netPL / buy) * 100).toFixed(2) : "";
+  return { netPL, returnPct };
 }
 
 const ActualPL = () => {
@@ -153,7 +169,12 @@ const ActualPL = () => {
     e.target.value = "";
   };
 
-  const { summary, realizedPL, unrealizedPL, invested } = calcActualPL(txns);
+  const txnsWithCalc = txns.map(txn => {
+    const { netPL, returnPct } = calcTxnCharges(txn);
+    return { ...txn, netPL, returnPct };
+  });
+
+  const { summary, realizedPL, unrealizedPL, invested } = calcActualPL(txnsWithCalc);
 
   return (
     <div className="w-full px-2 md:px-8 lg:px-16 xl:px-28 2xl:px-40 py-8 bg-gray-50 min-h-screen">
@@ -174,9 +195,9 @@ const ActualPL = () => {
             </tr>
           </thead>
           <tbody>
-            {txns.length === 0 ? (
+            {txnsWithCalc.length === 0 ? (
               <tr><td colSpan={8} className="text-center text-gray-400 py-8 text-lg">No transactions yet.</td></tr>
-            ) : txns.map((txn, idx) => (
+            ) : txnsWithCalc.map((txn, idx) => (
               <React.Fragment key={idx}>
                 <tr className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
                   onClick={() => setExpandedIdx(expandedIdx === idx ? null : idx)}>
@@ -260,10 +281,6 @@ const ActualPL = () => {
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">Other Charges</label>
             <input name="otherCharges" type="number" value={form.otherCharges} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Return %</label>
-            <input name="returnPct" type="number" value={form.returnPct} onChange={handleChange} className="border rounded px-2 py-1 text-sm w-24" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">Notes</label>

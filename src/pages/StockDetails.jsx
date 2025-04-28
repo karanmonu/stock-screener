@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import StockSummaryPanel from "../components/StockDetails/StockSummaryPanel";
 import FinancialMetricsPanel, { getRedFlags, redFlagRules } from "../components/StockDetails/FinancialMetricsPanel";
 import EditableFinancialsTable from "../components/StockDetails/EditableFinancialsTable";
 import ShareholdingPieChart from "../components/StockDetails/ShareholdingPieChart";
 import QuarterlyTrendsChart from "../components/StockDetails/QuarterlyTrendsChart";
-import ErrorBoundary from "../components/ErrorBoundary";
 
 // Demo/mock data for illustration. Replace with API data integration as needed.
 const mockStock = {
@@ -51,8 +50,61 @@ const mockTableRows = [
   { id: 2, metric: "PAT", value: "120000", unit: "Cr", period: "FY23" },
 ];
 
+const WATCHLIST_KEY = "stock_screener_watchlist";
+
+// --- Global error boundary for StockDetails page ---
+function ErrorBoundary({ children }) {
+  const [error, setError] = useState(null);
+  if (error) {
+    return (
+      <div className="bg-red-100 border-l-4 border-red-600 text-red-800 p-4 my-6 rounded">
+        <div className="font-bold mb-2">Something went wrong in Stock Details:</div>
+        <div className="text-xs whitespace-pre-wrap">{error.message || String(error)}</div>
+      </div>
+    );
+  }
+  return (
+    <React.Suspense fallback={null}>
+      <ErrorCatcher setError={setError}>{children}</ErrorCatcher>
+    </React.Suspense>
+  );
+}
+
+class ErrorCatcher extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    this.props.setError(error);
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 const StockDetails = () => {
   const { stockId } = useParams();
+  const [watchlistItem, setWatchlistItem] = useState(null);
+
+  // Load Watchlist data for this stock
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(WATCHLIST_KEY);
+      if (saved) {
+        const arr = JSON.parse(saved);
+        const found = arr.find(item => item.stockName === stockId);
+        setWatchlistItem(found || null);
+      }
+    } catch (err) {
+      console.error("Failed to load watchlist for StockDetails:", err);
+      setWatchlistItem(null);
+    }
+  }, [stockId]);
 
   // Prepare shareholding data for pie chart
   const data = mockMetrics; // or fetched data
@@ -96,6 +148,23 @@ const StockDetails = () => {
           </div>
         )}
         <h1 className="text-2xl font-bold mb-4">Stock Details</h1>
+        {watchlistItem && (
+          <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded">
+            <div className="font-bold text-yellow-700 mb-1 flex items-center gap-2">
+              <span>★ In Watchlist</span>
+            </div>
+            <div className="text-yellow-800 text-sm grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-1">
+              <div><span className="font-semibold">Grading (New):</span> {watchlistItem.gradingNew}</div>
+              <div><span className="font-semibold">Grading (Old):</span> {watchlistItem.gradingOld}</div>
+              <div><span className="font-semibold">Add Date:</span> {watchlistItem.addDate}</div>
+              <div><span className="font-semibold">Add Rate:</span> {watchlistItem.addRate}</div>
+              <div><span className="font-semibold">Current Rate:</span> {watchlistItem.currentRate}</div>
+              <div><span className="font-semibold">Change %:</span> <span className={parseFloat(watchlistItem.changePct) < 0 ? 'text-red-600 font-bold' : 'text-green-600 font-bold'}>{watchlistItem.changePct}</span></div>
+              <div><span className="font-semibold">Red Flags:</span> {watchlistItem.redFlags && watchlistItem.redFlags.length ? watchlistItem.redFlags.join('; ') : ''}</div>
+              <div><span className="font-semibold">Remarks:</span> {watchlistItem.remarks}</div>
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-6">
           <div className="col-span-2 flex flex-col gap-6">
             <StockSummaryPanel stock={mockStock} />
